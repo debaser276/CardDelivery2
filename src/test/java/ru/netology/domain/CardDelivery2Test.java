@@ -21,21 +21,24 @@ public class CardDelivery2Test {
 
     @Test
     public void shouldDateChange() {
-        CardRequest request = DataGenerator.Request.generate();
+        CardRequest request = DataGenerator.Request.generate("ru");
         $("[data-test-id='city'] [placeholder='Город']").sendKeys(request.getCity());
+        SelenideElement dateElement = $("[data-test-id='date'] [placeholder='Дата встречи']");
+        dateElement.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
+        String firstDate = DataGenerator.generateDate(1);
+        dateElement.sendKeys(firstDate);
         $("[data-test-id='name'] [name='name']").sendKeys(request.getName());
         $("[data-test-id='phone'] [name='phone']").sendKeys(request.getPhone());
         $("[data-test-id='agreement']").click();
         $(withText("Запланировать")).click();
 
-        SelenideElement dateElement = $("[data-test-id='date'] [placeholder='Дата встречи']");
         dateElement.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
-        LocalDate date = LocalDate.now().plusDays(5);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        dateElement.sendKeys(date.format(formatter));
+        String secondDate = DataGenerator.generateDate(6);
+        dateElement.sendKeys(secondDate);
         $(withText("Запланировать")).click();
 
         $(".notification__title").shouldHave(text("Успешно!"));
+        $(".notification__content").shouldHave(text(secondDate));
     }
 
 }
